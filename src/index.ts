@@ -78,7 +78,10 @@ io.on('connection', async (socket) => {
 	socket.on('disconnect', async () => {
 		systemMessage(socket, socket.data.chatroom, `User left: ${socket.id}`);
 
-		if (socket.data.chatroom in privateRooms) {
+		if (
+			socket.data.chatroom in privateRooms &&
+			privateRooms[socket.data.chatroom].host === socket.id
+		) {
 			console.log('destroying', socket.data.chatroom);
 			const sockets = await io.sockets.in(socket.data.chatroom).fetchSockets();
 			for (const socket of sockets) {
