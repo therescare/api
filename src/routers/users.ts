@@ -113,6 +113,16 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
 	next();
 }
 
+router.get('/', authenticate, async (req, res) => {
+	delete req.user.passwordHash;
+	res.json(req.user);
+});
+
+router.delete('/', authenticate, async (req, res) => {
+	await User.delete({ id: req.user.id });
+	res.status(204).send();
+})
+
 router.post('/moniker', authenticate, async (req, res) => {
 	if (dayjs().isBefore(req.user.canChangeMonikerAfter)) {
 		return res
@@ -124,7 +134,7 @@ router.post('/moniker', authenticate, async (req, res) => {
 	req.user.canChangeMonikerAfter = dayjs().add(7, 'days').toDate();
 	await req.user.save();
 
-	return req.user.moniker;
+	res.json({ moniker: req.user.moniker });
 });
 
 export default router;
