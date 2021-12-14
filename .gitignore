@@ -1,7 +1,10 @@
 dist/
 node_modules/
 
+# dev db
 data.db
 data.db-journal
+
+ormconfig.json
 
 .env

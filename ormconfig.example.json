@@ -1,0 +1,13 @@
+{
+	"type": "sqlite",
+	"database": "./data.db",
+	"logging": true,
+	"entities": ["dist/entities/**/*.js"],
+	"migrations": ["dist/migrations/**/*.js"],
+	"subscribers": ["dist/subscriber/**/*.js"],
+
+	"migrationsTableName": "__migrations",
+	"cli": {
+		"migrationsDir": "src/migrations"
+	}
+}
