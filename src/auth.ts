@@ -55,26 +55,26 @@ export async function authenticate(email: string, password: string) {
 	}
 }
 
-export async function createJWT(email: string) {
-	const user = await User.findOneOrFail({ email });
+export async function createJWT(id: string) {
+	const user = await User.findOneOrFail({ id });
 
-	const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+	const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 	return token;
 }
 
 export async function verifyJWT(token: string) {
 	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET) as { email: string };
+		const decoded = jwt.verify(token, process.env.JWT_SECRET) as { id: string };
 
-		const user = await User.findOneOrFail({ email: decoded.email });
+		const user = await User.findOneOrFail({ id: decoded.id });
 		return user;
 	} catch {
 		return null;
 	}
 }
 
-export async function refreshMoniker(email: string) {
-	const user = await User.findOneOrFail({ email });
+export async function refreshMoniker(id: string) {
+	const user = await User.findOneOrFail({ id });
 
 	user.moniker = generateMoniker();
 	user.canChangeMonikerAfter = dayjs().add(7, 'days').toDate();

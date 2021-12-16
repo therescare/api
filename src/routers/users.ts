@@ -96,7 +96,8 @@ router.post('/create', async (req, res) => {
 
 	try {
 		const user = await createUser(email, password);
-		return res.json({ moniker: user.moniker });
+		delete user.passwordHash;
+		return res.json(user);
 	} catch (e) {
 		return res.status(500).json({ error: e });
 	}
@@ -113,7 +114,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
 	next();
 }
 
-router.get('/', authenticate, async (req, res) => {
+router.get('/me', authenticate, async (req, res) => {
 	delete req.user.passwordHash;
 	res.json(req.user);
 });
