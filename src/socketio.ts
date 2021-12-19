@@ -17,7 +17,7 @@ export default function bind(server: http.Server) {
 	});
 
 	io.use(async (socket, next) => {
-		const token = socket.handshake.query.token;
+		const token = socket.handshake.auth.token;
 
 		if (!token) return next(new Error('No token provided'));
 		if (!(token instanceof String)) return next(new Error('Invalid token type'));
