@@ -20,9 +20,9 @@ export default function bind(server: http.Server) {
 		const token = socket.handshake.auth.token;
 
 		if (!token) return next(new Error('No token provided'));
-		if (!(token instanceof String)) return next(new Error('Invalid token type'));
+		if (typeof token !== 'string') return next(new Error('Invalid token type'));
 
-		const user = await verifyJWT(token as string);
+		const user = await verifyJWT(token);
 		if (!user) return next(new Error('Invalid token'));
 
 		socket.data.user = user;
@@ -45,7 +45,7 @@ export default function bind(server: http.Server) {
 			if (socket.data.chatroom) return; // don't allow joining multiple rooms
 			if (!slug) socket.disconnect();
 			if (![...Object.keys(predefinedRooms), ...Object.keys(privateRooms)].includes(slug))
-				socket.disconnect(); // invalid room
+				return socket.disconnect(); // invalid room
 
 			socket.data.chatroom = slug;
 			console.log(socket.id, socket.data.user.moniker, '->', slug);

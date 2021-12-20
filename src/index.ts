@@ -12,9 +12,11 @@ import * as TypeORM from 'typeorm';
 
 import chatroomsRouter from './routers/chatrooms';
 import usersRouter from './routers/users';
+import bind from './socketio';
 
 const app = Express();
 const server = http.createServer(app);
+bind(server);
 
 app.use(bodyParser.json());
 
