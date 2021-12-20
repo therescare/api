@@ -58,17 +58,14 @@ router.post('/', async (req, res) => {
 		return res.status(500).json({ error: 'Failed to create verification information' });
 	}
 
-	try {
-		await emailTransporter.sendMail({
+	emailTransporter
+		.sendMail({
 			from: '"there\'s care." <no-reply@theres.care>',
 			to: email,
 			subject: 'E-mail Verification',
 			html: emailTemplates.verify.replace(/%code%/g, verification.id)
-		});
-	} catch (e) {
-		console.error(e);
-		return res.status(500).send({ error: 'Failed to send e-mail properly' });
-	}
+		})
+		.catch(console.error);
 
 	res.status(204).send();
 });
