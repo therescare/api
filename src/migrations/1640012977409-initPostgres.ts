@@ -16,5 +16,6 @@ export class initPostgres1640012977409 implements MigrationInterface {
 	public async down(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(`DROP TABLE "user"`);
 		await queryRunner.query(`DROP TABLE "pending_verification"`);
+		await queryRunner.query('DROP EXTENSION IF EXISTS "uuid-ossp"');
 	}
 }
