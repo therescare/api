@@ -1,6 +1,10 @@
 {
-	"type": "sqlite",
-	"database": "./data.db",
+	"type": "postgres",
+	"host": "localhost",
+	"port": 5432,
+	"username": "therescare",
+	"password": "therescare",
+	"database": "therescare",
 	"logging": true,
 	"entities": ["dist/entities/**/*.js"],
 	"migrations": ["dist/migrations/**/*.js"],
