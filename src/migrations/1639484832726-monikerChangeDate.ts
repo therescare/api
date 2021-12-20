@@ -5,7 +5,7 @@ export class monikerChangeDate1639484832726 implements MigrationInterface {
 
 	public async up(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(
-			`CREATE TABLE "temporary_user" ("id" varchar PRIMARY KEY NOT NULL, "email" varchar NOT NULL, "passwordHash" varchar NOT NULL, "moniker" varchar NOT NULL, "canChangeMonikerAfter" datetime NOT NULL)`
+			`CREATE TABLE "temporary_user" ("id" varchar PRIMARY KEY NOT NULL, "email" varchar NOT NULL, "passwordHash" varchar NOT NULL, "moniker" varchar NOT NULL, "canChangeMonikerAfter" timestamptz NOT NULL)`
 		);
 		await queryRunner.query(
 			`INSERT INTO "temporary_user"("id", "email", "passwordHash", "moniker") SELECT "id", "email", "passwordHash", "moniker" FROM "user"`
