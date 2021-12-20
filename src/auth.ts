@@ -42,7 +42,7 @@ export async function authenticate(email: string, password: string) {
 	if (!user) return null;
 
 	if (await argon2.verify(user.passwordHash, password)) {
-		if (argon2.needsRehash(password, hashingOptions)) {
+		if (argon2.needsRehash(user.passwordHash, hashingOptions)) {
 			// in case hashing configuration changes
 			const passwordHash = await hash(password);
 			user.passwordHash = passwordHash;

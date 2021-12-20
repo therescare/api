@@ -6,7 +6,7 @@ import fs from 'fs';
 
 import { PendingVerification } from '../entities/pendingVerification';
 import { User } from '../entities/user';
-import { createUser, generateMoniker, verifyJWT } from '../auth';
+import { authenticate, createJWT, createUser, generateMoniker, verifyJWT } from '../auth';
 import dayjs from 'dayjs';
 
 declare global {
@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
 		});
 	} catch (e) {
 		console.error(e);
-		return res.status(500).send();
+		return res.status(500).send({ error: 'Failed to send e-mail properly' });
 	}
 
 	res.status(204).send();
@@ -95,15 +95,27 @@ router.post('/create', async (req, res) => {
 	}
 
 	try {
-		const user = await createUser(email, password);
+		const [user] = await Promise.all([createUser(email, password), possibleVerification.remove()]);
+		const token = await createJWT(user.id);
 		delete user.passwordHash;
-		return res.json(user);
+		return res.json({ token, user });
 	} catch (e) {
 		return res.status(500).json({ error: e });
 	}
 });
 
-async function authenticate(req: Request, res: Response, next: NextFunction) {
+router.post('/token', async (req, res) => {
+	const { email, password } = req.body;
+
+	const user = await authenticate(email, password);
+	if (!user) return res.status(403).json({ error: 'Invalid e-mail or password.' });
+
+	const token = await createJWT(user.id);
+	delete user.passwordHash;
+	res.json({ token, user });
+});
+
+async function authenticateMiddleware(req: Request, res: Response, next: NextFunction) {
 	if (!req.headers.authorization) return res.status(400).json({ error: 'No token provided' });
 
 	const user = await verifyJWT(req.headers.authorization);
@@ -114,17 +126,17 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
 	next();
 }
 
-router.get('/me', authenticate, async (req, res) => {
+router.get('/me', authenticateMiddleware, async (req, res) => {
 	delete req.user.passwordHash;
 	res.json(req.user);
 });
 
-router.delete('/', authenticate, async (req, res) => {
+router.delete('/', authenticateMiddleware, async (req, res) => {
 	await User.delete({ id: req.user.id });
 	res.status(204).send();
-})
+});
 
-router.post('/moniker', authenticate, async (req, res) => {
+router.post('/moniker', authenticateMiddleware, async (req, res) => {
 	if (dayjs().isBefore(req.user.canChangeMonikerAfter)) {
 		return res
 			.status(403)
